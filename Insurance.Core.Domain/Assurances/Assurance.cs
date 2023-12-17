@@ -35,9 +35,8 @@ namespace Insurance.Core.Domain.Assurances
         /// <summary>
         /// Calcular o valor do seguro com base na regra de negocio informada
         /// </summary>
-        private void CalculatingVehicleInsurance()
+        private void CalculatingVehicleInsurance(decimal vehicleAmount)
         {
-            var vehicleAmount = Vehicle?.Amount.Value ?? 0;
             var riskRate = (vehicleAmount * 5) / (2 * vehicleAmount);
             var riskPremium = riskRate * vehicleAmount;
             var purePremium = riskPremium * (1 + SafetyMargin);
@@ -46,19 +45,19 @@ namespace Insurance.Core.Domain.Assurances
             Amount = commercialPremium;
         }
 
-        public static Assurance Create(Insured insured, Vehicle vehicle)
+        public static Assurance Create(
+            Guid insuredId,
+            Guid vehicleId,
+            Money vehicleAmount)
         {
             var newAssuranceGuid = GenerateGuid();
 
             Assurance assurance = new(
                 newAssuranceGuid,
-                insured.Id,
-                vehicle.Id);
+                insuredId,
+                vehicleId);
 
-            assurance.Insured = insured;
-            assurance.Vehicle = vehicle;
-
-            assurance.CalculatingVehicleInsurance();
+            assurance.CalculatingVehicleInsurance(vehicleAmount.Value);
 
             return assurance;
         }
